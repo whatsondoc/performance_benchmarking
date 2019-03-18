@@ -24,7 +24,7 @@ then
 	CPU_SPIKE &	
 	echo -e "Task ${SLURM_TASK_PID} from job ID ${SLURM_JOBID} on core ${SLURM_PROCID} on `hostname`: Submitted"
 
-elif [[ ${TEST} == "IO & CPU" ]]
+elif [[ ${TEST} == "IO_and_CPU" ]]
 then
 	IO_SPIKE &
 	CPU_SPIKE &

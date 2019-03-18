@@ -13,7 +13,7 @@ TEST=$1
 
 if [[ ${TEST} == "BOTH" ]]
 then
-	TEST="IO & CPU"
+	TEST="IO_and_CPU"
 fi
 
 if [[ $# != 1 ]]
@@ -22,7 +22,7 @@ then
 	exit 1
 fi
 
-if [[ "${TEST}" != "IO" && "${TEST}" != "CPU" && "${TEST}" != "IO & CPU" ]]
+if [[ "${TEST}" != "IO" && "${TEST}" != "CPU" && "${TEST}" != "IO_and_CPU" ]]
 then
 	echo "***ERROR: Please specify an argument of either IO,  CPU or BOTH to the script. Exiting..."
 	exit 1
