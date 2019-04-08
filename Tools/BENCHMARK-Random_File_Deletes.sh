@@ -14,18 +14,18 @@ DELETION_TYPE="random"                          # Enter 'sequential' or 'random'
 #                                           YOU SHOULD NOT NEED TO CHANGE ANYTHING FROM HERE-ON IN (UNLESS YOU PARTICULARLY WANT TO)                                        #
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-#### Function to capture errors:
+#### A function to capture errors:
 error_captures() {
 ## Checking that 2 arguments have been passed to the script:
-if [[ $# != "2" ]]
+if [[ ${NUMBER_ARGS} != 2 ]]
 then 
-    echo -e "\nERROR:\tIncorrect number of arguments provided.\vPlease execute the script with a directory path to the files and a (whole) percentage number of those files to be deleted (in that order):"
-    echo -e "\n$ /path/to/script.sh /path/to/deletion/source 60\v"
+    echo -e "\nERROR:\tIncorrect number of arguments provided.\n\n\tPlease execute the script with a directory path to the files and a (whole) percentage number of those files to be deleted (in that order):"
+    echo -e "\n\t\t$ /path/to/script.sh /path/to/deletion/source 60\v"
     exit 1
 fi
 
 ## Checking the target directory path from the first argument exists/is accessible:
-if [[ ! -d $1 ]]
+if [[ ! -d ${DELETION_SOURCE} ]]
 then
     echo -e "\nERROR:\tDeletion source directory does not exist - exiting...\v"
     exit 1
@@ -40,7 +40,7 @@ then
 fi
 
 ## Checking the input number is an integer:
-if ! (($2)) 2> /dev/null 
+if ! ((${PERCENTAGE_DELETE})) 2> /dev/null 
 then
     echo -e "\nERROR:\tThe value set in the variable \$\{PERCENTAGE_DELETE\} is not an integer - exiting...\v"
     exit 1
@@ -49,7 +49,6 @@ fi
 ## Checking the packages required for this script to call certain commands exist on the local machine:
 REQUIRED_COMMANDS=( find echo shuf rm )
 ## Looping through the array above to check that the commands can be called:
-if 
 for CHECK_COMMAND in ${REQUIRED_COMMANDS[*]}
 do
     if [[ -x $(command -v ${CHECK_COMMAND}) ]]
@@ -60,14 +59,14 @@ do
 done
 }
 
-# Function to collect the information needed for the script to, well, function:
+#### A function to collect the information needed for the script to, well, function:
 collect_information() {
 ARRAY_ALL_FILES=( $(find ${DELETION_SOURCE} -type f) )
 NUMBER_FILES=$(echo ${ARRAY_ALL_FILES[*]} | wc -w)
 DELETABLE_NUMBER=$(( (${NUMBER_FILES} * ${PERCENTAGE_DELETE}) / 100 ))
 }
 
-# A function to initiate deletes using a random deletion method:
+#### A function to initiate deletes using a random deletion method:
 random_deletion() {
 if [[ ${ARE_YOU_SURE} != "YES_I_AM" ]]
 then
@@ -100,6 +99,7 @@ do
 done
 }
 
+#### A function to initiate deletes in a sequential fashion:
 sequential_deletion() {
 ## Making sure users are certain they are ready to proceed with the deletion script:
 if [[ ${ARE_YOU_SURE} != "YES_I_AM" ]]
@@ -119,7 +119,9 @@ do
 done
 }
 
-## Calling the funxctions:
+## Collecting the number of arguments passed to the script:
+NUMBER_ARGS=$#
+## Calling the functions:
 error_captures
 collect_information
 ${DELETION_TYPE}_deletion
