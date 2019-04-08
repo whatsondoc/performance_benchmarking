@@ -27,8 +27,8 @@ fi
 ## Checking the target directory path from the first argument exists/is accessible:
 if [[ ! -d ${DELETION_SOURCE} ]]
 then
-    echo -e "\nERROR:\tDeletion source directory does not exist - exiting...\v"
-    exit 1
+    echo -e "\nERROR:\tDeletion source directory does not exist."
+    TERMINATE="true"
 fi
 
 ## Checking to see whether the input included a percentage symbol:
@@ -42,8 +42,8 @@ fi
 ## Checking the input number is an integer:
 if ! ((${PERCENTAGE_DELETE})) 2> /dev/null 
 then
-    echo -e "\nERROR:\tThe value set in the variable \$\{PERCENTAGE_DELETE\} is not an integer - exiting...\v"
-    exit 1
+    echo -e "\nERROR:\tThe value set in the variable \$\{PERCENTAGE_DELETE\} is not an integer."
+    TERMINATE="true"
 fi
 
 ## Checking the packages required for this script to call certain commands exist on the local machine:
@@ -51,12 +51,18 @@ REQUIRED_COMMANDS=( find echo shuf rm )
 ## Looping through the array above to check that the commands can be called:
 for CHECK_COMMAND in ${REQUIRED_COMMANDS[*]}
 do
-    if [[ -x $(command -v ${CHECK_COMMAND}) ]]
+    if [[ ! -x $(command -v ${CHECK_COMMAND}) ]]
     then
-        echo -e "\nERROR:\tThe command \'${CHECK_COMMAND}\' is either not installed or within \$PATH - exiting...\v"
+        echo -e "ERROR:\tThe command ${CHECK_COMMAND} is either not installed or within \$PATH."
         TERMINATE="true"
     fi
 done
+
+if [[ ${TERMINATE} == "true" ]]
+then
+    echo -e "\vErrors detected - the script cannot execute.\v"
+    exit 1
+fi
 }
 
 #### A function to collect the information needed for the script to, well, function:
@@ -68,6 +74,7 @@ DELETABLE_NUMBER=$(( (${NUMBER_FILES} * ${PERCENTAGE_DELETE}) / 100 ))
 
 #### A function to initiate deletes using a random deletion method:
 random_deletion() {
+## Making sure users are certain they are ready to proceed with the deletion script:
 if [[ ${ARE_YOU_SURE} != "YES_I_AM" ]]
 then
     echo -e "\vERROR:\tDeletion state is not confirmed (this needs to be set in the script) - exiting..."
@@ -121,6 +128,7 @@ done
 
 ## Collecting the number of arguments passed to the script:
 NUMBER_ARGS=$#
+echo
 ## Calling the functions:
 error_captures
 collect_information
