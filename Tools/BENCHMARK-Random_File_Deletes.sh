@@ -42,12 +42,20 @@ fi
 ## Checking the input number is an integer:
 if ! ((${PERCENTAGE_DELETE})) 2> /dev/null 
 then
-    echo -e "\nERROR:\tThe value set in the variable \$\{PERCENTAGE_DELETE\} is not an integer."
+    echo -e "\nERROR:\tThe value set for the Percentage Delete figure is not an integer."
     TERMINATE="true"
 fi
 
+## Checking to see whether the user has specified a percentage delete value greater than 100:
+if (( ${PERCENTAGE_DELETE} > 100 ))
+then
+    ## If so, we will adjust the value set to be 100%:
+    PERCENTAGE_DELETE="100"
+    echo -e "\nINFO:\tSpecified percentage figure is above 100% - setting this value to 100%."
+fi
+
 ## Checking the packages required for this script to call certain commands exist on the local machine:
-REQUIRED_COMMANDS=( find echo shuf rm )
+REQUIRED_COMMANDS=( find shuf rm )
 ## Looping through the array above to check that the commands can be called:
 for CHECK_COMMAND in ${REQUIRED_COMMANDS[*]}
 do
@@ -70,6 +78,17 @@ collect_information() {
 ARRAY_ALL_FILES=( $(find ${DELETION_SOURCE} -type f) )
 NUMBER_FILES=$(echo ${ARRAY_ALL_FILES[*]} | wc -w)
 DELETABLE_NUMBER=$(( (${NUMBER_FILES} * ${PERCENTAGE_DELETE}) / 100 ))
+
+echo -e "\nExecution information:
+
+DATE & TIME:\t\t\t`date`
+SOURCE DIRECTORY:\t\t${DELETION_SOURCE}
+SOURCE FILE COUNT:\t\t${NUMBER_FILES}
+PERCENTAGE DELETE:\t\t${PERCENTAGE_DELETE}
+DELETE FILE COUNT:\t${DELETABLE_NUMBER}
+DELETION METHOD:\t\t${DELETION_TYPE}
+
+${USER} has provided confirmation for this script to go ahead: ${ARE_YOU_SURE}"
 }
 
 #### A function to initiate deletes using a random deletion method:
@@ -135,6 +154,7 @@ collect_information
 ${DELETION_TYPE}_deletion
 
 ## Prevent the script from terminating unfinished background processes:
+echo -e "\nAll delete operation requests submitted: waiting for completion..."
 wait
 
-echo -e "\vDeletion job complete.\v"
+echo -e "\nDeletion job complete.\v"
